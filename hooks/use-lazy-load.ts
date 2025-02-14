@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 let gameImages: { [id: string]: string } = {};
 
-export function useGameThumbnailLazyLoad(img: string) {
+export function useThumbnailLazyLoad(img: string) {
 	const [status, setStatus] = useState<string | undefined>(undefined);
 
 	useEffect(() => {
@@ -19,6 +19,6 @@ export function useGameThumbnailLazyLoad(img: string) {
 	return status;
 }
 
-export function addGameThumbnail(id: string, url: string) {
+export function addThumbnail(id: string, url: string) {
 	gameImages[id] = url;
 }

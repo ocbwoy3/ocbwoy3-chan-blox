@@ -1,11 +1,13 @@
 "use client";
 
 import { GameCard } from "@/components/gameCard";
+import { HomeLoggedInHeader } from "@/components/loggedInHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
 	getOmniRecommendationsHome,
 	OmniRecommendation,
 } from "@/lib/omniRecommendation";
+import { getCookie } from "@/lib/roblox";
 import { loadThumbnails, ThumbnailRequest } from "@/lib/thumbnailLoader";
 import { useEffect, useState } from "react";
 
@@ -27,8 +29,8 @@ export default function Home() {
 					})
 				})
 			});
-			loadThumbnails(th).catch(a=>console.error(a))
 			setRec(r);
+			loadThumbnails(th).catch(a=>console.error(a))
 		})();
 	}, []);
 
@@ -50,9 +52,9 @@ export default function Home() {
 
 	return (
 		<div className="overflow-scroll no-scrollbar w-screen max-h-screen h-screen">
-			{"roblox x next.js when"}
-			<br/>
-			{"experimental (functional) roblox.com clone"}
+			<HomeLoggedInHeader/>
+			{"roblox in nextjs"}<br/>
+			<span className="font-mono">{"require(\"@/lib/roblox\").getCookie().length = "}{getCookie().length}{";"}</span>
 			<div className="p-4 space-y-8 no-scrollbar">
 				{rec.sorts
 					.filter((a) => SORTS_ALLOWED_IDS.includes(a.topicId))

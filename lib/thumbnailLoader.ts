@@ -1,6 +1,6 @@
 "use client";
 
-import { addGameThumbnail } from "@/hooks/use-lazy-load";
+import { addThumbnail } from "@/hooks/use-lazy-load";
 import { getCookie } from "./roblox";
 
 export type AssetThumbnail = {
@@ -45,7 +45,9 @@ export async function getThumbnails(b: ThumbnailRequest[]): Promise<AssetThumbna
 export async function loadThumbnails(b: ThumbnailRequest[]): Promise<void> {
 	const th = await getThumbnails(b);
 	th.forEach(a=>{
-		addGameThumbnail(a.targetId.toString(), a.imageUrl)
+		// match GameThumbnail from 4972273297::GameThumbnail:384x216:webp:regular and any like- string
+		const ty = b.find(c=>c.targetId==a.targetId)!
+		addThumbnail(ty.type+'_'+a.targetId.toString(), a.imageUrl)
 	})
 }
 

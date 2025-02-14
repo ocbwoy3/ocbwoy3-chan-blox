@@ -1,5 +1,5 @@
 import React from 'react';
-import { useGameThumbnailLazyLoad } from '@/hooks/use-lazy-load';
+import { useThumbnailLazyLoad } from '@/hooks/use-lazy-load';
 
 interface LazyLoadedImageProps {
 	imgId: string;
@@ -8,7 +8,7 @@ interface LazyLoadedImageProps {
 }
 
 const LazyLoadedImage: React.FC<LazyLoadedImageProps> = ({ imgId, alt, ...props }: LazyLoadedImageProps) => {
-	const imgUrl = useGameThumbnailLazyLoad(imgId);
+	const imgUrl = useThumbnailLazyLoad(imgId);
 
 	return (
 		<div>

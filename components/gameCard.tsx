@@ -1,4 +1,4 @@
-import { useGameThumbnailLazyLoad } from "@/hooks/use-lazy-load";
+import { useThumbnailLazyLoad } from "@/hooks/use-lazy-load";
 import { ContentMetadata } from "@/lib/omniRecommendation";
 import LazyLoadedImage from "./lazyLoadedImage";
 import { ContextMenu, ContextMenuContent, ContextMenuSeparator, ContextMenuTrigger } from "./ui/context-menu";
@@ -16,7 +16,7 @@ export function GameCard({ game }: GameCardProps) {
 					<div className="overflow-hidden">
 						{game.primaryMediaAsset ? (
 							<LazyLoadedImage
-								imgId={game.rootPlaceId.toString()}
+								imgId={'GameThumbnail_'+game.rootPlaceId.toString()}
 								alt={game.name}
 								className="object-cover w-full h-full"
 							/>
