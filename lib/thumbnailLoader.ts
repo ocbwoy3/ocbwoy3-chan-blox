@@ -41,12 +41,12 @@ export async function getThumbnails(
 						targetId: a.targetId,
 						token: "",
 						format: a.format,
-						size: a.size,
+						size: a.size
 					}))
 				),
 				headers: {
-					"Content-Type": "application/json",
-				},
+					"Content-Type": "application/json"
+				}
 			}
 		);
 		const json = await data.json();

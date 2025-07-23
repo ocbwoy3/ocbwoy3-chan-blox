@@ -13,8 +13,8 @@ export async function proxyFetch(
 		typeof input === "string"
 			? input
 			: input instanceof Request
-			? input.url
-			: "";
+				? input.url
+				: "";
 	const proxyUrl = `/api/proxy?url=${encodeURIComponent(url)}`;
 
 	// fix headers
@@ -25,7 +25,7 @@ export async function proxyFetch(
 		...init,
 		method: init?.method || "GET",
 		headers,
-		body: init?.body,
+		body: init?.body
 	};
 
 	return window.fetch(proxyUrl, fetchInit);

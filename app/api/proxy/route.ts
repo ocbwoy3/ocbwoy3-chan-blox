@@ -7,7 +7,7 @@ async function proxyRequest(request: Request, method: string) {
 			JSON.stringify({ error: "Missing `url` query parameter." }),
 			{
 				status: 400,
-				headers: { "Content-Type": "application/json" },
+				headers: { "Content-Type": "application/json" }
 			}
 		);
 	}
@@ -21,7 +21,7 @@ async function proxyRequest(request: Request, method: string) {
 	const init: RequestInit = {
 		method,
 		headers,
-		body: method === "GET" || method === "HEAD" ? undefined : request.body,
+		body: method === "GET" || method === "HEAD" ? undefined : request.body
 	};
 
 	if (init.body !== undefined) {
@@ -35,7 +35,7 @@ async function proxyRequest(request: Request, method: string) {
 
 	return new Response(response.body, {
 		status: response.status,
-		headers: responseHeaders,
+		headers: responseHeaders
 	});
 }
 

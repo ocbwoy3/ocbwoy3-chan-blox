@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 // Shared cache and listeners
 const gameImages: { [id: string]: string } = {};
@@ -27,6 +27,6 @@ export function useThumbnailURL(img: string) {
 export function addThumbnail(id: string, url: string) {
 	gameImages[id] = url;
 	if (listeners[id]) {
-		listeners[id].forEach(cb => cb(url));
+		listeners[id].forEach((cb) => cb(url));
 	}
 }
