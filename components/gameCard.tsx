@@ -1,14 +1,16 @@
-import { useThumbnailLazyLoad } from "@/hooks/use-lazy-load";
+"use client";
+
 import { ContentMetadata } from "@/lib/omniRecommendation";
 import LazyLoadedImage from "./lazyLoadedImage";
 import { ContextMenu, ContextMenuContent, ContextMenuSeparator, ContextMenuTrigger } from "./ui/context-menu";
 import { ContextMenuItem } from "@radix-ui/react-context-menu";
+import React from "react";
 
 interface GameCardProps {
 	game: ContentMetadata;
 }
 
-export function GameCard({ game }: GameCardProps) {
+export const GameCard = React.memo(function GameCard({ game }: GameCardProps) {
 	return (
 		<ContextMenu>
 			<ContextMenuTrigger>
@@ -22,43 +24,37 @@ export function GameCard({ game }: GameCardProps) {
 							/>
 						) : (
 							<div className="w-full h-full flex items-center justify-center bg-muted">
-								<span className="text-muted-foreground">No image</span>
+								<span className="text-muted-foreground">{":("}</span>
 							</div>
 						)}
 					</div>
-					<div className="bg-muted-foreground flex right-2 bottom-2 absolute rounded-lg p-1 py-0">
+					<div className="bg-base flex right-2 bottom-2 absolute rounded-lg p-1 py-0">
 						{game.playerCount.toLocaleString()}
 					</div>
 				</div>
 			</ContextMenuTrigger>
-			<ContextMenuContent className="w-64">
+			<ContextMenuContent className="w-64 p-2 space-y-1">
 				<ContextMenuItem disabled className="text-xs text-muted-foreground">
 					{game.name}
 				</ContextMenuItem>
 				<ContextMenuItem disabled className="text-xs text-muted-foreground">
-					{Math.round((game.totalUpVotes/(game.totalUpVotes+game.totalDownVotes))*100)}% rating - {game.playerCount} players
+					{Math.round((game.totalUpVotes/(game.totalUpVotes+game.totalDownVotes))*100)}% rating - {game.playerCount.toLocaleString()} playing
 				</ContextMenuItem>
 				<ContextMenuSeparator/>
-				<ContextMenuItem onClick={()=>{window.location.href = (`https://roblox.com/games/${game.rootPlaceId}`)}}>
-					Open
+				<ContextMenuItem>
+					<a href={`https://roblox.com/games/${game.rootPlaceId}`}>Open URL</a>
 				</ContextMenuItem>
 				<ContextMenuItem onClick={()=>{window.location.href = (`roblox://placeId=${game.rootPlaceId}`)}}>
 					Play
 				</ContextMenuItem>
 				<ContextMenuSeparator/>
-				<ContextMenuItem onClick={()=>{navigator.clipboard.writeText(`https://roblox.com/games/${game.rootPlaceId}`)}}>
-					copy game url
-				</ContextMenuItem>
 				<ContextMenuItem onClick={()=>{navigator.clipboard.writeText(`${game.rootPlaceId}`)}}>
-					copy game id
+					Copy rootPlaceId
 				</ContextMenuItem>
 				<ContextMenuItem onClick={()=>{navigator.clipboard.writeText(`${game.universeId}`)}}>
-					copy universe id
-				</ContextMenuItem>
-				<ContextMenuItem onClick={()=>{navigator.clipboard.writeText(`roblox://placeId=${game.rootPlaceId}`)}}>
-					copy roblox:// uri
+					Copy universeId
 				</ContextMenuItem>
 			</ContextMenuContent>
 		</ContextMenu>
 	);
-}
+});

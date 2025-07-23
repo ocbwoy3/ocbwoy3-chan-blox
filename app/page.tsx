@@ -2,35 +2,29 @@
 
 import { GameCard } from "@/components/gameCard";
 import { HomeLoggedInHeader } from "@/components/loggedInHeader";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
 	getOmniRecommendationsHome,
 	OmniRecommendation,
 } from "@/lib/omniRecommendation";
-import { getCookie } from "@/lib/roblox";
-import { loadThumbnails, ThumbnailRequest } from "@/lib/thumbnailLoader";
+import { loadThumbnails } from "@/lib/thumbnailLoader";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-	const [rec, setRec] = useState<OmniRecommendation | null>(null);
 	const SORTS_ALLOWED_IDS = [100000003, 100000001];
+	const [rec, setRec] = useState<OmniRecommendation | null>(null);
 	useEffect(() => {
 		(async () => {
 			const r = await getOmniRecommendationsHome();
-			console.log("[ROBLOX]", "got omni recommendation from api", r);
-			let th: ThumbnailRequest[] = [];
-			r.sorts.filter(a=>SORTS_ALLOWED_IDS.includes(a.topicId)).forEach(b=>{
-				(b.recommendationList || []).forEach(c=>{
-					th.push({
-						type: "GameThumbnail",
-						targetId: r.contentMetadata.Game[c.contentId.toString()].rootPlaceId,
-						format: "webp",
-						size: "384x216"
-					})
-				})
-			});
 			setRec(r);
-			loadThumbnails(th).catch(a=>console.error(a))
+			loadThumbnails(
+				Object.entries(r.contentMetadata.Game).map((a) => ({
+					type: "GameThumbnail",
+					targetId: Number(a[1].rootPlaceId),
+					format: "webp",
+					size: "384x216",
+				}))
+			).catch((a) => {});
 		})();
 	}, []);
 
@@ -41,7 +35,7 @@ export default function Home() {
 					<CardContent className="p-4">
 						<div className="h-[200px] flex items-center justify-center">
 							<div className="animate-pulse text-muted-foreground">
-								Loading...
+								{"Loading..."}
 							</div>
 						</div>
 					</CardContent>
@@ -52,15 +46,13 @@ export default function Home() {
 
 	return (
 		<div className="overflow-scroll no-scrollbar w-screen max-h-screen h-screen">
-			<HomeLoggedInHeader/>
-			{"roblox in nextjs"}<br/>
-			<span className="font-mono">{"require(\"@/lib/roblox\").getCookie().length = "}{getCookie().length}{";"}</span>
+			<HomeLoggedInHeader />
 			<div className="p-4 space-y-8 no-scrollbar">
 				{rec.sorts
 					.filter((a) => SORTS_ALLOWED_IDS.includes(a.topicId))
 					.map((sort, idx) => (
 						<div key={idx}>
-							<h1 className="text-2xl">{sort.topic}</h1>
+							<h1 className="text-2xl pb-2">{sort.topic}</h1>
 							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 								{(sort.recommendationList || []).map(
 									(recommendation, idxb) => {
@@ -68,7 +60,9 @@ export default function Home() {
 											rec.contentMetadata.Game[
 												recommendation.contentId.toString()
 											];
-										return <GameCard key={idxb} game={game} />;
+										return (
+											<GameCard key={idxb} game={game} />
+										);
 									}
 								)}
 							</div>

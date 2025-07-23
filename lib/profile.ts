@@ -1,4 +1,5 @@
 import { getCookie } from "./roblox"
+import { proxyFetch } from "./utils"
 
 export type UserProfileDetails = {
 	description: string,
@@ -16,11 +17,11 @@ export async function getLoggedInUser(): Promise<{
 	name: string,
 	displayName: string
 }> {
-	const data = await fetch(`${document.baseURI}api/user/authenticated`, {
+	const data = await proxyFetch(`https://users.roblox.com/v1/users/authenticated`, {
 		method: "GET",
 		headers: {
-			Authorization: `${getCookie()}`
-		},
+			"Content-Type": "application/json"
+		}
 	})
 	return (await data.json() as any) as {
 		id: number,
@@ -30,11 +31,11 @@ export async function getLoggedInUser(): Promise<{
 }
 
 export async function getUserByUserId(userid: string): Promise<UserProfileDetails> {
-	const data = await fetch(`${document.baseURI}api/user?id=${userid}`, {
+	const data = await proxyFetch(`https://users.roblox.com/v1/users/${userid}`, {
 		method: "GET",
 		headers: {
-			Authorization: `${getCookie()}`
-		},
+			"Content-Type": "application/json"
+		}
 	})
 	return (await data.json() as any) as UserProfileDetails
 }

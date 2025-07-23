@@ -1,5 +1,6 @@
 import React from 'react';
-import { useThumbnailLazyLoad } from '@/hooks/use-lazy-load';
+import { useThumbnailURL } from '@/hooks/use-lazy-load';
+import { Skeleton } from './ui/skeleton';
 
 interface LazyLoadedImageProps {
 	imgId: string;
@@ -7,15 +8,19 @@ interface LazyLoadedImageProps {
 	[prop: string]: string
 }
 
-const LazyLoadedImage: React.FC<LazyLoadedImageProps> = ({ imgId, alt, ...props }: LazyLoadedImageProps) => {
-	const imgUrl = useThumbnailLazyLoad(imgId);
+const LazyLoadedImage: React.FC<React.ImgHTMLAttributes<HTMLImageElement> & LazyLoadedImageProps> = ({
+	imgId,
+	alt,
+	...props
+}) => {
+	const imgUrl = useThumbnailURL(imgId);
 
 	return (
 		<div>
 			{imgUrl ? (
 				<img src={imgUrl} alt={alt} {...props} />
 			) : (
-				<p>Loading...</p>
+				<Skeleton {...props} />
 			)}
 		</div>
 	);

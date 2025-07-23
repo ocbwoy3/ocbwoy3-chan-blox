@@ -1,6 +1,7 @@
 "use client";
 
 import { getCookie } from "./roblox";
+import { proxyFetch } from "./utils";
 
 type RecommendationEntry = {
 	contentType: "Game"|string,
@@ -59,11 +60,8 @@ export type OmniRecommendation = {
 }
 
 export async function getOmniRecommendationsHome(): Promise<OmniRecommendation> {
-	const data = await fetch(`${document.baseURI}api/discovery/omni-recommendation`,{
+	const data = await proxyFetch(`https://apis.roblox.com/discovery-api/omni-recommendation`,{
 		method: "POST",
-		headers: {
-			Authorization: `${getCookie()}`
-		},
 		body: JSON.stringify({
 			pageType: "Home",
 			sessionId: crypto.randomUUID(),
@@ -72,7 +70,10 @@ export async function getOmniRecommendationsHome(): Promise<OmniRecommendation> 
 			cpuCores: 4,
 			maxResolution: "1920x1080",
 			maxMemory: 8192
-		})
+		}),
+		headers: {
+			"Content-Type": "application/json"
+		}
 	})
 	return await data.json() as OmniRecommendation
 }
