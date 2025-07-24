@@ -58,7 +58,7 @@ export type OmniRecommendation = {
 	sorts: RecommendationSort[];
 };
 
-export async function getOmniRecommendationsHome(): Promise<OmniRecommendation> {
+export async function getOmniRecommendationsHome(): Promise<OmniRecommendation | null> {
 	const data = await proxyFetch(
 		`https://apis.roblox.com/discovery-api/omni-recommendation`,
 		{
@@ -77,7 +77,11 @@ export async function getOmniRecommendationsHome(): Promise<OmniRecommendation> 
 			}
 		}
 	);
-	return (await data.json()) as OmniRecommendation;
+	const J = await data.json();
+	if (J.errors) {
+		return null;
+	}
+	return J as OmniRecommendation;
 }
 
 // https://apis.roblox.com/discovery-api/omni-recommendation

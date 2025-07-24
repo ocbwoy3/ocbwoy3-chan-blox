@@ -1,13 +1,17 @@
 "use client";
 
+import { FriendsHomeSect } from "@/components/FriendsOnlineSection";
 import { GameCard } from "@/components/gameCard";
 import { HomeLoggedInHeader } from "@/components/loggedInHeader";
+import { VerifiedIcon } from "@/components/RobloxIcons";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
 import {
 	getOmniRecommendationsHome,
 	OmniRecommendation
 } from "@/lib/omniRecommendation";
 import { loadThumbnails } from "@/lib/thumbnailLoader";
+import { AlertTriangleIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function Home() {
@@ -16,21 +20,34 @@ export default function Home() {
 	useEffect(() => {
 		setTimeout(async () => {
 			const r = await getOmniRecommendationsHome();
-			setRec(r);
-			loadThumbnails(
-				Object.entries(r.contentMetadata.Game).map((a) => ({
-					type: "GameThumbnail",
-					targetId: Number(a[1].rootPlaceId),
-					format: "webp",
-					size: "384x216"
-				}))
-			).catch((a) => {});
+			if (r) {
+				setRec(r);
+				loadThumbnails(
+					Object.entries(r.contentMetadata.Game).map((a) => ({
+						type: "GameThumbnail",
+						targetId: Number(a[1].rootPlaceId),
+						format: "webp",
+						size: "384x216"
+					}))
+				).catch((a) => {});
+			}
 		}, 1000);
 	}, []);
 
 	return (
 		<div className="overflow-scroll no-scrollbar w-screen max-h-screen h-screen">
 			<HomeLoggedInHeader />
+			<FriendsHomeSect className="pt-8" />
+			<div className="justify-center w-screen px-8 pt-6">
+				<Alert variant="default" className="space-x-2">
+					<AlertTriangleIcon />
+					<AlertTitle>Warning</AlertTitle>
+					<AlertDescription>
+						This is work in progess, you can follow the development
+						process on GitHub.
+					</AlertDescription>
+				</Alert>
+			</div>
 			<div className="p-4 space-y-8 no-scrollbar">
 				{!rec ? (
 					<Card>

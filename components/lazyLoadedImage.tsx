@@ -9,15 +9,23 @@ interface LazyLoadedImageProps {
 	[prop: string]: string;
 }
 
-const LazyLoadedImage: React.FC<
-	LazyLoadedImageProps
-> = ({ imgId, alt, ...props }) => {
+const LazyLoadedImage: React.FC<LazyLoadedImageProps> = ({
+	imgId,
+	alt,
+	...props
+}) => {
 	const imgUrl = useThumbnailURL(imgId);
 
 	return (
 		<div>
 			{imgUrl ? (
-				<Image src={imgUrl as any} width={1024} height={1024} alt={alt} {...props} />
+				<Image
+					src={imgUrl as any}
+					width={1024}
+					height={1024}
+					alt={alt}
+					{...props}
+				/>
 			) : (
 				<Skeleton {...props} />
 			)}

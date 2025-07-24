@@ -1,3 +1,5 @@
+"use client";
+
 import { proxyFetch } from "./utils";
 
 export type UserProfileDetails = {
@@ -15,7 +17,7 @@ export async function getLoggedInUser(): Promise<{
 	id: number;
 	name: string;
 	displayName: string;
-}> {
+} | null> {
 	const data = await proxyFetch(
 		`https://users.roblox.com/v1/users/authenticated`,
 		{
@@ -25,7 +27,11 @@ export async function getLoggedInUser(): Promise<{
 			}
 		}
 	);
-	return (await data.json()) as any as {
+	const J = await data.json();
+	if (J.errors) {
+		return null;
+	}
+	return J as any as {
 		id: number;
 		name: string;
 		displayName: string;
