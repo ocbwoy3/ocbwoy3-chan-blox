@@ -1,6 +1,6 @@
 import React from "react";
 import { useThumbnailURL } from "@/hooks/use-lazy-load";
-import { Skeleton } from "./ui/skeleton";
+import { Skeleton } from "../ui/skeleton";
 import Image from "next/image";
 
 interface LazyLoadedImageProps {

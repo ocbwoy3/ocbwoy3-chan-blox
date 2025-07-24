@@ -1,13 +1,13 @@
 "use client";
 
 import { ContentMetadata } from "@/lib/omniRecommendation";
-import LazyLoadedImage from "./lazyLoadedImage";
+import LazyLoadedImage from "../util/LazyLoadedImage";
 import {
 	ContextMenu,
 	ContextMenuContent,
 	ContextMenuSeparator,
 	ContextMenuTrigger
-} from "./ui/context-menu";
+} from "../ui/context-menu";
 import { ContextMenuItem } from "@radix-ui/react-context-menu";
 import React from "react";
 

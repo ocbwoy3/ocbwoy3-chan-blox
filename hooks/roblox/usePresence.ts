@@ -57,7 +57,9 @@ async function fetchPresence(acctId: number) {
 		);
 
 		if (!res.ok) {
-			throw new Error(`API request failed with status ${res.status}`);
+			console.log(`[usePresence] API Error ${res.status} ${res.statusText}`)
+			return
+			// throw new Error(`API request failed with status ${res.status}`);
 		}
 
 		const json = await res.json();

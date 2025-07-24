@@ -10,7 +10,7 @@ import { loadThumbnails } from "@/lib/thumbnailLoader";
 let isFetching = false;
 let cachedData: any = null;
 
-export function useFriendsHome() {
+export function useBestFriends() {
 	const acct = useCurrentAccount();
 	const [friends, setFriends] = useState<
 		| {
@@ -40,18 +40,13 @@ export function useFriendsHome() {
 		}
 		isFetching = true;
 		(async () => {
-			const friendsAPICall = await proxyFetch(
-				`https://friends.roblox.com/v1/users/${acct.id}/friends/find?userSort=1`
-			);
-			const J = (await friendsAPICall.json()) as {
-				PageItems: { id: number }[];
-			};
+			const BestFriendIDs = JSON.parse(window.localStorage.getItem("BestFriendsStore") || "[]") as number[]
 			const friendsAPICall2 = await proxyFetch(
 				`https://users.roblox.com/v1/users`,
 				{
 					method: "POST",
 					body: JSON.stringify({
-						userIds: J.PageItems.map((a) => a.id),
+						userIds: BestFriendIDs,
 						excludeBannedUsers: false
 					})
 				}
@@ -72,10 +67,10 @@ export function useFriendsHome() {
 					format: "webp"
 				}))
 			).catch(() => {});
-			const friendsList = J.PageItems.map((a) => {
-				const x = J2.data.find((b) => b.id === a.id);
+			const friendsList = BestFriendIDs.map((a) => {
+				const x = J2.data.find((b) => b.id === a);
 				return {
-					id: a.id,
+					id: a,
 					hasVerifiedBadge: x?.hasVerifiedBadge || false,
 					name: x?.name || "?",
 					displayName: x?.displayName || "?"

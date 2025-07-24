@@ -2,9 +2,8 @@ import { PremiumIconSmall, VerifiedIcon } from "./RobloxIcons";
 import {
 	Tooltip,
 	TooltipContent,
-	TooltipProvider,
 	TooltipTrigger
-} from "./ui/tooltip";
+} from "../ui/tooltip";
 
 export function RobloxPremiumSmall(props: React.SVGProps<SVGSVGElement>) {
 	return (

@@ -14,7 +14,7 @@ export type AssetThumbnail = {
 };
 
 export type ThumbnailRequest = {
-	type: "GameThumbnail" | "AvatarHeadShot";
+	type: "GameThumbnail" | "AvatarHeadShot" | "Outfit" | `${string}`;
 	targetId: number;
 	format: "webp";
 	size: string;
