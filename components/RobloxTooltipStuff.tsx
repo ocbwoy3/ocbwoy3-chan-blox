@@ -28,7 +28,7 @@ export function RobloxVerifiedSmall(
 				<VerifiedIcon {...props} />
 			</TooltipTrigger>
 			<TooltipContent className="bg-surface0 text-text m-2">
-				<p className="text-sm">Verified user</p>
+				<p className="text-sm">Verified</p>
 			</TooltipContent>
 		</Tooltip>
 	);

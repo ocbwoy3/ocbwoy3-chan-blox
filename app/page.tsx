@@ -3,6 +3,7 @@
 import { FriendsHomeSect } from "@/components/FriendsOnlineSection";
 import { GameCard } from "@/components/gameCard";
 import { HomeLoggedInHeader } from "@/components/loggedInHeader";
+import { QuickTopUI, QuickTopUILogoPart } from "@/components/QuickTopUI";
 import { VerifiedIcon } from "@/components/RobloxIcons";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
@@ -35,7 +36,9 @@ export default function Home() {
 	}, []);
 
 	return (
-		<div className="overflow-scroll no-scrollbar w-screen max-h-screen h-screen">
+		<div className="overflow-scroll no-scrollbar w-screen max-h-screen h-screen antialiased overflow-x-hidden">
+			<QuickTopUI />
+			<QuickTopUILogoPart />
 			<HomeLoggedInHeader />
 			<FriendsHomeSect className="pt-8" />
 			<div className="justify-center w-screen px-8 pt-6">

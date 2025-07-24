@@ -1,12 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import LazyLoadedImage from "./lazyLoadedImage";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { OctagonXIcon } from "lucide-react";
 import { RobloxPremiumSmall, RobloxVerifiedSmall } from "./RobloxTooltipStuff";
 import { useCurrentAccount } from "@/hooks/roblox/useCurrentAccount";
 import { Skeleton } from "./ui/skeleton";
+import { useFriendsPresence } from "@/hooks/roblox/usePresence";
 
 export function HomeLoggedInHeader() {
 	const profile = useCurrentAccount();
@@ -26,8 +27,24 @@ export function HomeLoggedInHeader() {
 		);
 	}
 
+	const presence = useFriendsPresence(profile ? [profile.id] : []);
+
+	const userActivity = presence.find((b) => b.userId === profile?.id)
+	const userPresence = userActivity?.userPresenceType;
+	const borderColor =
+		userPresence === 1
+			? "border-blue bg-blue/50"
+			: userPresence === 2
+			? "border-green bg-green/50"
+			: userPresence === 3
+			? "border-yellow bg-yellow/50"
+			: userPresence === 0
+			? "border-surface2 bg-surface2/50"
+			: "border-red bg-red/50";
+
 	return (
 		<>
+			{/* <button onClick={()=>console.log(userPresence)}>debug this</button> */}
 			<div className="flex items-center gap-6 bg-base rounded-xl px-8 py-6 w-fit mt-8 ml-0">
 				{!profile ? (
 					<Skeleton className="w-28 h-28 rounded-full" />
@@ -35,7 +52,7 @@ export function HomeLoggedInHeader() {
 					<LazyLoadedImage
 						imgId={`AvatarHeadShot_${profile.id}`}
 						alt=""
-						className="w-28 h-28 rounded-full shadow-crust"
+						className={`w-28 h-28 rounded-full shadow-crust border-2 ${borderColor}`}
 					/>
 				)}
 				<div className="flex flex-col justify-center">
@@ -53,7 +70,10 @@ export function HomeLoggedInHeader() {
 					</span>
 					<span className="text-base font-mono text-subtext0 mt-1">
 						{profile ? (
-							<>@{profile.name}</>
+							<>
+								@{profile.name}
+								{(!!userActivity && userPresence === 2) ? <> - {userActivity.lastLocation}</> : <></> }
+							</>
 						) : (
 							<Skeleton className="w-64 h-6 rounded-lg" />
 						)}

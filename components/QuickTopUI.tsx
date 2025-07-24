@@ -2,18 +2,27 @@
 
 import { useRobuxBalance } from "@/hooks/roblox/useRobuxBalance";
 import { RobuxIcon } from "./RobloxIcons";
+import React from "react";
 
-export function QuickTopUI() {
+export const QuickTopUI = React.memo(function () {
 	const robux = useRobuxBalance();
 	return (
-		<span className="z-50 absolute top-4 right-4 p-4 flex gap-4 items-center">
-			<img src="/icon-128.webp" className="-m-1 w-8 h-8" alt="" />
-			<span className="rounded-full bg-crust/50 flex items-center p-2">
-				<span className="px-2 font-sans text-blue text-xl flex items-center">
+		<div className="z-50 absolute top-4 right-4 p-4 flex gap-4 items-center">
+			<div className="rounded-full bg-crust/50 flex items-center p-2">
+				<div className="px-2 font-sans text-blue text-xl flex items-center">
 					<RobuxIcon className="w-6 h-6" />
-					<p className="pl-1">{robux}</p>
-				</span>
-			</span>
-		</span>
+					<p className="pl-1">{robux || "???"}</p>
+				</div>
+			</div>
+		</div>
 	);
-}
+});
+
+export const QuickTopUILogoPart = React.memo(function () {
+	return (
+		<div className="z-50 relative top-4 left-4 p-4 flex gap-4 items-center text-blue">
+			<img src="/icon-128.webp" className="-m-1 w-8 h-8" alt="" />
+			<p className="mt-2">{"ocbwoy3-chan-blox"}</p>
+		</div>
+	);
+});

@@ -26,7 +26,7 @@ export type ThumbnailRequest = {
 export async function getThumbnails(
 	b: ThumbnailRequest[]
 ): Promise<AssetThumbnail[]> {
-	const batchSize = 50;
+	const batchSize = 100;
 	const results: AssetThumbnail[] = [];
 	for (let i = 0; i < b.length; i += batchSize) {
 		const batch = b.slice(i, i + batchSize);

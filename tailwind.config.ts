@@ -115,6 +115,7 @@ export default {
 	},
 	plugins: [
 		require("tailwindcss-animate"),
+		require("@tailwindcss/line-clamp"),
 		require("@catppuccin/tailwindcss")({
 			prefix: false,
 			defaultFlavour: "mocha"

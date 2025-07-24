@@ -4,46 +4,40 @@ import { useEffect, useState } from "react";
 import { useCurrentAccount } from "./useCurrentAccount";
 import { proxyFetch } from "@/lib/utils";
 
-let isFetching = false;
-let cachedData: number | false | null = null;
-
 export function useRobuxBalance() {
 	const acct = useCurrentAccount();
-	const [robux, setRobux] = useState<number | false | null>(cachedData);
+	const [robux, setRobux] = useState<number | false | null>(null);
 
 	useEffect(() => {
-		let cancelled = false;
 		if (!acct) return;
 
-		async function fetchBalance() {
-			if (isFetching) return;
-			if (!acct) return;
-			isFetching = true;
+		let cancelled = false;
+
+		const fetchBalance = async () => {
+			if (!acct || cancelled) return;
 			try {
 				const res = await proxyFetch(
 					`https://economy.roblox.com/v1/users/${acct.id}/currency`
 				);
 				const data = await res.json();
 				if (!cancelled) setRobux(data.robux);
-				cachedData = data.robux;
 			} catch {
 				if (!cancelled) setRobux(false);
-				cachedData = false;
-			} finally {
-				isFetching = false;
 			}
-		}
+		};
 
 		fetchBalance();
+		const interval = setInterval(fetchBalance, 10000);
 
-		function handleTransaction() {
+		const handleTransaction = () => {
 			fetchBalance();
-		}
+		};
 
 		window.addEventListener("transactionCompletedEvent", handleTransaction);
 
 		return () => {
 			cancelled = true;
+			clearInterval(interval);
 			window.removeEventListener(
 				"transactionCompletedEvent",
 				handleTransaction

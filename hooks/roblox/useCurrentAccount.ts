@@ -9,7 +9,7 @@ import { loadThumbnails } from "@/lib/thumbnailLoader";
 import { useEffect, useState } from "react";
 
 let isFetching = false;
-let cachedData: any = null;
+let cachedData: UserProfileDetails | null | false = null;
 
 export function useCurrentAccount() {
 	const [profileDetails, setProfileDetails] = useState<
@@ -18,7 +18,7 @@ export function useCurrentAccount() {
 
 	useEffect(() => {
 		let cancelled = false;
-		if (profileDetails !== null) return;
+		if (profileDetails !== null && profileDetails !== undefined) return;
 		if (isFetching) {
 			const IN = setInterval(() => {
 				if (cachedData !== null) {
