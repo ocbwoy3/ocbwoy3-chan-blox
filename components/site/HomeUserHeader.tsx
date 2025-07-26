@@ -12,6 +12,18 @@ import { useCurrentAccount } from "@/hooks/roblox/useCurrentAccount";
 import { Skeleton } from "../ui/skeleton";
 import { useFriendsPresence } from "@/hooks/roblox/usePresence";
 import { useAccountSettings } from "@/hooks/roblox/useAccountSettings";
+import { loadThumbnails } from "@/lib/thumbnailLoader";
+import { toast } from "sonner";
+
+// chatgpt + human
+function randomGreeting(name: string): string {
+	const greetings = [
+		`Howdy, ${name}`
+	];
+
+	const index = Math.floor(Math.random() * greetings.length);
+	return greetings[index];
+}
 
 export function HomeLoggedInHeader() {
 	const profile = useCurrentAccount();
@@ -52,7 +64,23 @@ export function HomeLoggedInHeader() {
 	return (
 		<>
 			{/* <button onClick={()=>console.log(userPresence)}>debug this</button> */}
-			<div className="flex items-center gap-6 rounded-xl px-8 py-6 w-fit mt-8 ml-0">
+			<div
+				className="flex items-center gap-6 rounded-xl px-8 py-6 w-fit mt-8 ml-0"
+				onContextMenu={(e) => {
+					if (e.button === 2) {
+						toast("[debug] reloading user pfp");
+						console.log("[debug] reloading user pfp");
+						loadThumbnails([
+							{
+								type: "AvatarHeadShot",
+								targetId: profile ? profile.id : 1,
+								format: "webp",
+								size: "720x720"
+							}
+						]).catch(() => {});
+					}
+				}}
+			>
 				{!isLoaded ? (
 					<Skeleton className="w-28 h-28 rounded-full" />
 				) : (
@@ -64,14 +92,7 @@ export function HomeLoggedInHeader() {
 				)}
 				<div className="flex flex-col justify-center">
 					<span className="text-3xl font-bold text-text flex items-center gap-2">
-						{isLoaded ? (
-							<>
-								{!!accountSettings &&
-								accountSettings.IsPremium === true
-									? `Howdy, ${profile.displayName}`
-									: `${profile.displayName}`}
-							</>
-						) : (
+						{isLoaded ? randomGreeting(window.localStorage.UserPreferredName || profile.displayName || "Robloxian!") : (
 							<>
 								<Skeleton className="w-96 h-8 rounded-lg" />
 							</>
