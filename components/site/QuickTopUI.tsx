@@ -154,9 +154,9 @@ export const QuickTopUILogoPart = React.memo(function () {
 			<Link href="/" className="-m-1 w-8 h-8">
 				<img src="/icon-512.webp" className="w-8 h-8" alt="" />
 			</Link>
-			<Link href="/test" className="mt-2">
+			<Link href="/test" className="mt-2 gap-2 flex items-center">
 				<p>{"ocbwoy3-chan's roblox"}</p>
-				<p className="mt-2 text-surface2 font-mono line-clamp-1">{process.env.NODE_ENV} {process.env.NEXT_PUBLIC_CWD} {process.env.NEXT_PUBLIC_ARGV0}</p>
+				<p className="text-surface2 line-clamp-1">{process.env.NODE_ENV} {process.env.NEXT_PUBLIC_CWD} {process.env.NEXT_PUBLIC_ARGV0}</p>
 			</Link>
 		</div>
 	);
