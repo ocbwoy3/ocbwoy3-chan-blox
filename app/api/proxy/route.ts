@@ -1,10 +1,18 @@
+// chatgpt
+function rewriteCookieDomain(rawCookie: string): string {
+	return rawCookie
+		.replace(/;?\s*Domain=[^;]+/i, '')
+		.concat(`; Domain=localhost:3000`);
+}
+
+// chatgpt
 async function proxyRequest(request: Request, method: string) {
 	const { searchParams } = new URL(request.url);
 	const target = searchParams.get("url");
 
 	if (!target) {
 		return new Response(
-			JSON.stringify({ error: "Missing `url` query parameter." }),
+			JSON.stringify({ error: "missing url param, dumbass" }),
 			{
 				status: 400,
 				headers: { "Content-Type": "application/json" }
@@ -16,7 +24,7 @@ async function proxyRequest(request: Request, method: string) {
 
 	const headers = new Headers(request.headers);
 	headers.delete("host");
-	headers.delete("accept-encoding"); // ! important
+	headers.delete("accept-encoding");
 
 	const init: RequestInit = {
 		method,
@@ -30,8 +38,20 @@ async function proxyRequest(request: Request, method: string) {
 
 	const response = await fetch(targetUrl, init);
 
+	// Copy all response headers
 	const responseHeaders = new Headers(response.headers);
-	responseHeaders.delete("content-encoding"); // ! important
+	responseHeaders.delete("content-encoding");
+
+	const rawSetCookies = response.headers.getSetCookie?.() ?? [];
+
+	if (rawSetCookies.length > 0) {
+		responseHeaders.delete("set-cookie");
+
+		for (const rawCookie of rawSetCookies) {
+			const rewritten = rewriteCookieDomain(rawCookie);
+			responseHeaders.append("set-cookie", rewritten);
+		}
+	}
 
 	return new Response(response.body, {
 		status: response.status,

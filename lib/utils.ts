@@ -7,10 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
-/**
- * ! Do not use in actual code, only used by proxy fetch to fix the CSRF thing
-*/
-async function proxyFetchRaw(
+export async function proxyFetchRaw(
 	input: RequestInfo | URL,
 	init?: RequestInit
 ): Promise<Response> {
@@ -18,8 +15,8 @@ async function proxyFetchRaw(
 		typeof input === "string"
 			? input
 			: input instanceof Request
-			? input.url
-			: "";
+				? input.url
+				: "";
 
 	const proxyUrl = `/api/proxy?url=${encodeURIComponent(url)}`;
 
@@ -31,7 +28,7 @@ async function proxyFetchRaw(
 		...init,
 		method: init?.method || "GET",
 		headers,
-		body: init?.body
+		body: init?.body,
 	};
 
 	return window.fetch(proxyUrl, fetchInit);
@@ -60,7 +57,7 @@ export async function proxyFetch(
 
 		response = await proxyFetchRaw(input, {
 			...init,
-			headers: newHeaders
+			headers: newHeaders,
 		});
 	}
 
