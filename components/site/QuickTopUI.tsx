@@ -10,13 +10,18 @@ import { toast } from "sonner";
 import { OutfitSelector } from "./OutfitQuickChooser";
 import { proxyFetch } from "@/lib/utils";
 import { loadThumbnails } from "@/lib/thumbnailLoader";
+import Link from "next/link";
+import { useFriendsHome } from "@/hooks/roblox/useFriends";
+import { useBestFriends } from "@/hooks/roblox/useBestFriends";
+import { useCurrentAccount } from "@/hooks/roblox/useCurrentAccount";
+import { useFriendsPresence } from "@/hooks/roblox/usePresence";
 
 /**
 requires csrf token cuz u cant use noblox.js on the web
 
 either go to https://roblox.com/my/avataar or the app to change ur fit
 */
-async function updateOutfit(outfit: { id: number }, acc: {id: number}) {
+async function updateOutfit(outfit: { id: number }, acc: { id: number }) {
 	try {
 		const J = (await (
 			await proxyFetch(
@@ -32,7 +37,7 @@ async function updateOutfit(outfit: { id: number }, acc: {id: number}) {
 			{
 				method: "POST",
 				body: JSON.stringify({
-					assetIds: J.assets.map(a=>a.id).filter(a=>!!a)
+					assetIds: J.assets.map((a) => a.id).filter((a) => !!a)
 				})
 			}
 		);
@@ -47,21 +52,28 @@ async function updateOutfit(outfit: { id: number }, acc: {id: number}) {
 	} catch {}
 }
 
-
-
 export const QuickTopUI = React.memo(function () {
+	const f = useFriendsHome();
+	const bf = useBestFriends();
+	useCurrentAccount();
+
+	useFriendsPresence([...(f ? f : []), ...(bf ? bf : [])].map(a=>a.id))
+
 	const robux = useRobuxBalance();
 	const [isOutfitSelectorVisible, setIsOutfitSelectorVisible] =
 		useState<boolean>(false);
 	return (
 		<>
-			{/* {isOutfitSelectorVisible ? (
-				<OutfitSelector setVisible={setIsOutfitSelectorVisible} updateOutfit={updateOutfit} />
+			{isOutfitSelectorVisible ? (
+				<OutfitSelector
+					setVisible={setIsOutfitSelectorVisible}
+					updateOutfit={updateOutfit}
+				/>
 			) : (
 				<></>
-			)} */}
+			)}
 			<div className="z-50 absolute top-4 right-4 p-4 flex gap-2 items-center text-blue/75">
-				{/* <StupidHoverThing text="Change Outfit">
+				<StupidHoverThing text="Change Outfit">
 					<button
 						className="rounded-full bg-crust/50 flex items-center p-2"
 						onClick={() => {
@@ -70,7 +82,7 @@ export const QuickTopUI = React.memo(function () {
 					>
 						<ShirtIcon />
 					</button>
-				</StupidHoverThing> */}
+				</StupidHoverThing>
 
 				<StupidHoverThing
 					text={!robux ? "Loading..." : `You have ${robux} Robux`}
@@ -78,7 +90,7 @@ export const QuickTopUI = React.memo(function () {
 					<div className="rounded-full bg-crust/50 flex items-center p-2">
 						<RobuxIcon className="w-6 h-6" />
 						{robux ? (
-							<p className="pl-1">{robux || "???"}</p>
+							<p className="pl-1">{robux.toLocaleString()}</p>
 						) : (
 							<></>
 						)}
@@ -92,8 +104,12 @@ export const QuickTopUI = React.memo(function () {
 export const QuickTopUILogoPart = React.memo(function () {
 	return (
 		<div className="z-[15] relative top-4 left-4 p-4 flex gap-4 items-center text-blue">
-			<img src="/icon-512.webp" className="-m-1 w-8 h-8" alt="" />
-			<p className="mt-2">{"not roblox lol"}</p>
+			<Link href="/" className="-m-1 w-8 h-8">
+				<img src="/icon-512.webp" className="w-8 h-8" alt="" />
+			</Link>
+			<Link href="/test" className="mt-2">
+				<p>{"ocbwoy3-chan's roblox"}</p>
+			</Link>
 		</div>
 	);
 });

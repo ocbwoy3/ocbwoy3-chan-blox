@@ -63,9 +63,10 @@ export function FriendCarousel({
 		}
 		setFriendsLabel(
 			[
-				`${friends.length}`,
+				// `${friends.length}`,
+				(numOnline+numGame+numStudio === 0 || numOnline === 0) ? null : `${numOnline+numGame+numStudio} online`,
 				numGame === 0 ? null : `${numGame} in-game`,
-				numStudio === 0 ? null : `${numStudio} studio`
+
 			]
 				.filter((a) => !!a)
 				.join(" | ")
