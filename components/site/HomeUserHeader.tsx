@@ -17,9 +17,7 @@ import { toast } from "sonner";
 
 // chatgpt + human
 function randomGreeting(name: string): string {
-	const greetings = [
-		`Howdy, ${name}`
-	];
+	const greetings = [`Howdy, ${name}`];
 
 	const index = Math.floor(Math.random() * greetings.length);
 	return greetings[index];
@@ -52,12 +50,12 @@ export function HomeLoggedInHeader() {
 		userPresence === 1
 			? "border-blue/25 bg-blue/25"
 			: userPresence === 2
-			? "border-green/25 bg-green/25"
-			: userPresence === 3
-			? "border-yellow/25 bg-yellow/25"
-			: userPresence === 0
-			? "border-surface2/25 bg-surface2/25"
-			: "border-red/25 bg-red/25";
+				? "border-green/25 bg-green/25"
+				: userPresence === 3
+					? "border-yellow/25 bg-yellow/25"
+					: userPresence === 0
+						? "border-surface2/25 bg-surface2/25"
+						: "border-red/25 bg-red/25";
 
 	const isLoaded = !!profile && !!accountSettings;
 
@@ -92,7 +90,13 @@ export function HomeLoggedInHeader() {
 				)}
 				<div className="flex flex-col justify-center">
 					<span className="text-3xl font-bold text-text flex items-center gap-2">
-						{isLoaded ? randomGreeting(window.localStorage.UserPreferredName || profile.displayName || "Robloxian!") : (
+						{isLoaded ? (
+							randomGreeting(
+								window.localStorage.UserPreferredName ||
+									profile.displayName ||
+									"Robloxian!"
+							)
+						) : (
 							<>
 								<Skeleton className="w-96 h-8 rounded-lg" />
 							</>

@@ -1,49 +1,49 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCurrentAccount } from "./useCurrentAccount";
 import { proxyFetch } from "@/lib/utils";
+import { useEffect } from "react";
 
 export function useRobuxBalance() {
 	const acct = useCurrentAccount();
-	const [robux, setRobux] = useState<number | false | null>(null);
+	const queryClient = useQueryClient();
 
-	useEffect(() => {
-		if (!acct) return;
-
-		let cancelled = false;
-
-		const fetchBalance = async () => {
-			if (!acct || cancelled) return;
+	const { data: robux } = useQuery<number | false | null>({
+		queryKey: ["robux-balance", acct ? acct.id : "acctId"],
+		queryFn: async () => {
+			if (!acct) return null;
 			try {
 				const res = await proxyFetch(
 					`https://economy.roblox.com/v1/users/${acct.id}/currency`
 				);
 				const data = await res.json();
-				if (!cancelled) setRobux(data.robux);
+				return data.robux;
 			} catch {
-				if (!cancelled) setRobux(false);
+				return false;
 			}
-		};
+		},
+		enabled: !!acct,
+		refetchInterval: 10000,
+		staleTime: 10000
+	});
 
-		fetchBalance();
-		const interval = setInterval(fetchBalance, 10000);
-
+	useEffect(() => {
 		const handleTransaction = () => {
-			fetchBalance();
+			queryClient.invalidateQueries({
+				queryKey: ["robux-balance", acct ? acct.id : "acctId"]
+			});
 		};
 
 		window.addEventListener("transactionCompletedEvent", handleTransaction);
 
 		return () => {
-			cancelled = true;
-			clearInterval(interval);
 			window.removeEventListener(
 				"transactionCompletedEvent",
 				handleTransaction
 			);
 		};
-	}, [acct]);
+	}, [acct ? acct.id : "acctId", queryClient]);
 
 	return robux;
 }

@@ -10,10 +10,16 @@ import { useCurrentAccount } from "@/hooks/roblox/useCurrentAccount";
 
 type OutfitSelectorProps = {
 	setVisible: (visible: boolean) => void;
-	updateOutfit: (outfit: { id: number }, acc: {id: number}) => Promise<void>;
+	updateOutfit: (
+		outfit: { id: number },
+		acc: { id: number }
+	) => Promise<void>;
 };
 
-export function OutfitSelector({ setVisible, updateOutfit }: OutfitSelectorProps) {
+export function OutfitSelector({
+	setVisible,
+	updateOutfit
+}: OutfitSelectorProps) {
 	const outfits = useAvatarOutfits();
 	const acc = useCurrentAccount();
 
@@ -33,7 +39,7 @@ export function OutfitSelector({ setVisible, updateOutfit }: OutfitSelectorProps
 						key={outfit.id}
 						className="hover:bg-base/50 rounded-lg"
 						onClick={async () => {
-							updateOutfit(outfit,acc);
+							updateOutfit(outfit, acc);
 							setVisible(false);
 						}}
 					>

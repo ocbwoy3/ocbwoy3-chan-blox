@@ -1,46 +1,41 @@
 "use client";
 
-// https://friends.roblox.com/v1/users/1083030325/friends/find?userSort=1
-
-import { useEffect, useState } from "react";
-import { useCurrentAccount } from "./useCurrentAccount";
+import { useQuery } from "@tanstack/react-query";
 import { proxyFetch } from "@/lib/utils";
 import { loadThumbnails } from "@/lib/thumbnailLoader";
+import { useCurrentAccount } from "./useCurrentAccount";
 
-let isFetching = false;
-let cachedData: any = null;
-
-export function useBestFriends() {
+export function useBestFriends():
+	| {
+			hasVerifiedBadge: boolean;
+			id: number;
+			name: string;
+			displayName: string;
+	  }[]
+	| null
+	| false {
 	const acct = useCurrentAccount();
-	const [friends, setFriends] = useState<
+
+	const query = useQuery<
 		| {
 				hasVerifiedBadge: boolean;
 				id: number;
 				name: string;
 				displayName: string;
 		  }[]
-		| null
 		| false
-	>(cachedData);
+	>({
+		queryKey: ["bestFriends", acct ? acct.id : "acctId"],
+		enabled: !!acct,
+		queryFn: async () => {
+			if (!acct) return false;
 
-	useEffect(() => {
-		let cancelled = false;
-		if (!acct) return;
-		if (isFetching) {
-			const IN = setInterval(() => {
-				if (cachedData !== null) {
-					if (!cancelled) setFriends(cachedData);
-					clearInterval(IN);
-				}
-			}, 50);
-			return () => {
-				clearInterval(IN);
-				cancelled = true;
-			};
-		}
-		isFetching = true;
-		(async () => {
-			const BestFriendIDs = JSON.parse(window.localStorage.getItem("BestFriendsStore") || "[]") as number[]
+			const BestFriendIDs = JSON.parse(
+				window.localStorage.getItem("BestFriendsStore") || "[]"
+			) as number[];
+
+			if (BestFriendIDs.length === 0) return [];
+
 			const friendsAPICall2 = await proxyFetch(
 				`https://users.roblox.com/v1/users`,
 				{
@@ -51,6 +46,7 @@ export function useBestFriends() {
 					})
 				}
 			);
+
 			const J2 = (await friendsAPICall2.json()) as {
 				data: {
 					hasVerifiedBadge: boolean;
@@ -59,6 +55,7 @@ export function useBestFriends() {
 					displayName: string;
 				}[];
 			};
+
 			loadThumbnails(
 				J2.data.map((a) => ({
 					type: "AvatarHeadShot",
@@ -67,7 +64,8 @@ export function useBestFriends() {
 					format: "webp"
 				}))
 			).catch(() => {});
-			const friendsList = BestFriendIDs.map((a) => {
+
+			return BestFriendIDs.map((a) => {
 				const x = J2.data.find((b) => b.id === a);
 				return {
 					id: a,
@@ -76,14 +74,10 @@ export function useBestFriends() {
 					displayName: x?.displayName || "?"
 				};
 			});
-			if (!cancelled) setFriends(friendsList);
-			cachedData = friendsList;
-			isFetching = false;
-		})();
-		return () => {
-			cancelled = true;
-		};
-	}, [acct]);
+		},
+		staleTime: 1000 * 60 * 5,
+		refetchOnWindowFocus: false
+	});
 
-	return friends;
+	return query.data ?? null;
 }

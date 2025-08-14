@@ -13,17 +13,17 @@ import {
 	OmniRecommendation
 } from "@/lib/omniRecommendation";
 import { loadThumbnails } from "@/lib/thumbnailLoader";
+import { useQuery } from "@tanstack/react-query";
 import { AlertTriangleIcon } from "lucide-react";
-import { useEffect, useState } from "react";
 
 export default function Home() {
 	const SORTS_ALLOWED_IDS = [100000003, 100000001];
-	const [rec, setRec] = useState<OmniRecommendation | null>(null);
-	useEffect(() => {
-		setTimeout(async () => {
+
+	const { data: rec } = useQuery({
+		queryKey: ["omni-recommendations"],
+		queryFn: async () => {
 			const r = await getOmniRecommendationsHome();
 			if (r) {
-				setRec(r);
 				loadThumbnails(
 					Object.entries(r.contentMetadata.Game).map((a) => ({
 						type: "GameThumbnail",
@@ -33,8 +33,11 @@ export default function Home() {
 					}))
 				).catch((a) => {});
 			}
-		}, 1000);
-	}, []);
+			return r;
+		},
+		staleTime: 300000, // 5 minutes
+		refetchOnWindowFocus: false
+	});
 
 	return (
 		<>

@@ -22,5 +22,12 @@ export function BestFriendsHomeSect(
 ) {
 	const friends = useBestFriends();
 
-	return <FriendCarousel {...props} title="Best Friends" dontSortByActivity friends={friends} />;
+	return (
+		<FriendCarousel
+			{...props}
+			title="Best Friends"
+			dontSortByActivity
+			friends={friends}
+		/>
+	);
 }

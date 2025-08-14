@@ -1,7 +1,6 @@
 import { useCurrentAccount } from "@/hooks/roblox/useCurrentAccount";
-import { useFriendsHome } from "@/hooks/roblox/useFriends";
 import { useFriendsPresence } from "@/hooks/roblox/usePresence";
-import React, { useEffect, useState } from "react";
+import React, { useMemo } from "react";
 import LazyLoadedImage from "../util/LazyLoadedImage";
 import { StupidHoverThing } from "../util/MiscStuff";
 import { VerifiedIcon } from "./RobloxIcons";
@@ -29,78 +28,32 @@ export function FriendCarousel({
 }) {
 	const acct = useCurrentAccount();
 	const presence = useFriendsPresence(
-		(!!friendsUnsorted ? friendsUnsorted : []).map((f) => f.id)
+		(friendsUnsorted || []).map((f) => f.id)
 	);
 
-	const [friendsLabel, setFriendsLabel] = useState<string>("");
+	const friends = useMemo(() => {
+		if (!friendsUnsorted) return [];
 
-	const [friends, setFriends] = useState<
-		{
-			hasVerifiedBadge: boolean;
-			id: number;
-			name: string;
-			displayName: string;
-		}[]
-	>([]);
+		return [...friendsUnsorted].sort((a, b) => {
+			if (dontSortByActivity) return -10;
 
-	useEffect(() => {
-		let numStudio = 0;
-		let numGame = 0;
-		let numOnline = 0;
-		for (const friend of friendsUnsorted || []) {
-			const st = presence.find((c) => c.userId === friend.id);
-			switch (st?.userPresenceType || 0) {
-				case 1:
-					numOnline += 1;
-					break;
-				case 2:
-					numGame += 1;
-					break;
-				case 3:
-					numStudio += 1;
-					break;
-			}
-		}
-		setFriendsLabel(
-			[
-				// `${friends.length}`,
-				(numOnline+numGame+numStudio === 0 || numOnline === 0) ? null : `${numOnline+numGame+numStudio} online`,
-				numGame === 0 ? null : `${numGame} in-game`,
+			const userStatusA = presence.find((c) => c.userId === a.id);
+			const userStatusB = presence.find((c) => c.userId === b.id);
 
-			]
-				.filter((a) => !!a)
-				.join(" | ")
-		);
-
-		if (!friendsUnsorted) {
-			setFriends([]);
-			return;
-		}
-		setFriends(
-			friendsUnsorted.sort((a, b) => {
-				if (!!dontSortByActivity) return -10;
-				const userStatusA = presence.find((c) => c.userId === a.id);
-				const userStatusB = presence.find((c) => c.userId === b.id);
-
-				return (
-					(userStatusB?.userPresenceType || 0) -
-					(userStatusA?.userPresenceType || 0)
-				);
-			})
-		);
+			return (
+				(userStatusB?.userPresenceType || 0) -
+				(userStatusA?.userPresenceType || 0)
+			);
+		});
 	}, [friendsUnsorted, presence, dontSortByActivity]);
 
-	if (!friends || friends.length === 0) {
-		return <></>;
+	if (friends.length === 0) {
+		return null;
 	}
 
 	return (
 		<div {...props}>
-			{/* <button onClick={()=>console.log(acct,presence,friends)}>debug</button> */}
-			<h1 className="text-2xl pt-4 pl-4 -mb-4">
-				{title}{" "}
-				<span className="text-overlay1 text-sm pl-2">{friendsLabel}</span>
-			</h1>
+			<h1 className="text-2xl pt-4 pl-4 -mb-4">{title}</h1>
 			<div className="rounded-xl flex flex-col gap-2 px-4 no-scrollbar">
 				<div
 					className="flex p-8 items-center gap-4 overflow-x-auto overflow-y-visible no-scrollbar pb-2 -mx-4 w-screen scrollbar-thin scrollbar-thumb-surface2 scrollbar-track-surface0"
@@ -110,7 +63,6 @@ export function FriendCarousel({
 						scrollbarWidth: "none"
 					}}
 				>
-					{/* <div className="w-8" /> */}
 					{friends.map((a) => {
 						const userStatus = presence.find(
 							(b) => b.userId === a.id
@@ -161,15 +113,16 @@ export function FriendCarousel({
 													className={`w-4 h-4 shrink-0`}
 												/>
 											) : null}
-											{ userPresence >= 2 ? <p>{userStatus?.lastLocation}</p> : <></>}
+											{userPresence >= 2 ? (
+												<p>
+													{userStatus?.lastLocation}
+												</p>
+											) : null}
 										</span>
 									</div>
 								}
 							>
-								<div
-									key={a.id}
-									className="flex flex-col min-w-[6.5rem]"
-								>
+								<div className="flex flex-col min-w-[6.5rem]">
 									<LazyLoadedImage
 										imgId={`AvatarHeadShot_${a.id}`}
 										alt={a.name}
@@ -191,7 +144,6 @@ export function FriendCarousel({
 							</StupidHoverThing>
 						);
 					})}
-					{/* <div className="w-8" /> */}
 				</div>
 			</div>
 		</div>

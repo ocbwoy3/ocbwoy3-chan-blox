@@ -1,7 +1,7 @@
 // chatgpt
 function rewriteCookieDomain(rawCookie: string): string {
 	return rawCookie
-		.replace(/;?\s*Domain=[^;]+/i, '')
+		.replace(/;?\s*Domain=[^;]+/i, "")
 		.concat(`; Domain=localhost:3000`);
 }
 

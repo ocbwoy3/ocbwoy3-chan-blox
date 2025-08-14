@@ -1,61 +1,36 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import {
 	getLoggedInUser,
 	getUserByUserId,
 	UserProfileDetails
 } from "@/lib/profile";
 import { loadThumbnails } from "@/lib/thumbnailLoader";
-import { useEffect, useState } from "react";
 
-let isFetching = false;
-let cachedData: UserProfileDetails | null | false = null;
-
-export function useCurrentAccount() {
-	const [profileDetails, setProfileDetails] = useState<
-		UserProfileDetails | null | false
-	>(cachedData);
-
-	useEffect(() => {
-		let cancelled = false;
-		if (profileDetails !== null && profileDetails !== undefined) return;
-		if (isFetching) {
-			const IN = setInterval(() => {
-				if (cachedData !== null) {
-					if (!cancelled) setProfileDetails(cachedData);
-					clearInterval(IN);
-				}
-			}, 50);
-			return () => {
-				clearInterval(IN);
-				cancelled = true;
-			};
-		}
-		isFetching = true;
-		(async () => {
+export function useCurrentAccount(): UserProfileDetails | null | false {
+	const query = useQuery<UserProfileDetails | false>({
+		queryKey: ["currentAccount"],
+		queryFn: async () => {
 			const authed = await getLoggedInUser();
-			if (authed) {
-				const user = await getUserByUserId(authed.id.toString());
-				if (!cancelled) setProfileDetails(user);
-				cachedData = user;
-				loadThumbnails([
-					{
-						type: "AvatarHeadShot",
-						targetId: authed.id,
-						format: "webp",
-						size: "720x720"
-					}
-				]).catch(() => {});
-			} else {
-				if (!cancelled) setProfileDetails(false);
-				cachedData = false;
-			}
-			isFetching = false;
-		})();
-		return () => {
-			cancelled = true;
-		};
-	}, [profileDetails]);
+			if (!authed) return false;
 
-	return profileDetails;
+			const user = await getUserByUserId(authed.id.toString());
+
+			loadThumbnails([
+				{
+					type: "AvatarHeadShot",
+					targetId: authed.id,
+					format: "webp",
+					size: "720x720"
+				}
+			]).catch(() => {});
+
+			return user;
+		},
+		staleTime: 1000 * 60 * 5,
+		refetchOnWindowFocus: false
+	});
+
+	return query.data ?? null;
 }

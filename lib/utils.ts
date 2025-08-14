@@ -28,7 +28,7 @@ export async function proxyFetchRaw(
 		...init,
 		method: init?.method || "GET",
 		headers,
-		body: init?.body,
+		body: init?.body
 	};
 
 	return window.fetch(proxyUrl, fetchInit);
@@ -57,7 +57,7 @@ export async function proxyFetch(
 
 		response = await proxyFetchRaw(input, {
 			...init,
-			headers: newHeaders,
+			headers: newHeaders
 		});
 	}
 

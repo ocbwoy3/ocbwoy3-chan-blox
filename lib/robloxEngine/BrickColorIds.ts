@@ -242,7 +242,7 @@ export function findClosestBrickColor(hex: string): {
 	col: [number, number, number];
 } {
 	const target = hexToRgb(hex);
-	console.log(hex,target)
+	console.log(hex, target);
 	if (!target) throw new Error("Invalid hex");
 
 	let bestDist = Infinity;

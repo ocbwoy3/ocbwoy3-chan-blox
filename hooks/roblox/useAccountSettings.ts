@@ -1,67 +1,84 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCurrentAccount } from "./useCurrentAccount";
 import { proxyFetch } from "@/lib/utils";
+import { useEffect } from "react";
 
 type AccountSettings = {
-	ChangeUsernameEnabled: boolean
+	ChangeUsernameEnabled: boolean;
 
 	/* determines if the account owner is a roblox admin */
-	IsAdmin: boolean,
+	IsAdmin: boolean;
 
-	PreviousUserNames: string,
+	PreviousUserNames: string;
 
 	/* censored out email */
-	UserEmail: string,
+	UserEmail: string;
 
-	UserAbove13: boolean,
+	UserAbove13: boolean;
 
 	/* does the user have roblox premium */
-	IsPremium: boolean,
+	IsPremium: boolean;
 
 	/* ingame chat */
-	IsGameChatSettingEnabled: boolean
-}
+	IsGameChatSettingEnabled: boolean;
+};
 
 export function useAccountSettings() {
 	const acct = useCurrentAccount();
-	const [accountSettings, setAccountSettings] = useState<AccountSettings | false | null>(null);
+	const queryClient = useQueryClient();
 
-	useEffect(() => {
-		if (!acct) return;
-
-		let cancelled = false;
-
-		const fetchSetttings = async () => {
-			if (!acct || cancelled) return;
+	const { data: accountSettings } = useQuery<AccountSettings | false | null>({
+		queryKey: ["account-settings", acct ? acct.id : "acctId"],
+		queryFn: async () => {
+			if (!acct) return null;
 			try {
 				const res = await proxyFetch(
 					`https://www.roblox.com/my/settings/json`
 				);
+				if (!res.ok) {
+					console.error(
+						`[useAccountSettings] API Error ${res.status} ${res.statusText}`
+					);
+					return false;
+				}
 				const data = await res.json();
-				if (!cancelled) setAccountSettings(data);
-			} catch {
-				if (!cancelled) setAccountSettings(false);
+				return data;
+			} catch (error) {
+				console.error(
+					"[useAccountSettings] Failed to fetch settings",
+					error
+				);
+				return false;
 			}
-		};
+		},
+		enabled: !!acct,
+		staleTime: Infinity,
+		refetchOnWindowFocus: false,
+		refetchOnMount: false,
+		refetchOnReconnect: false
+	});
 
-		fetchSetttings();
-
+	useEffect(() => {
 		const handleTransaction = () => {
-			fetchSetttings();
+			queryClient.invalidateQueries({
+				queryKey: ["account-settings", acct ? acct.id : "acctId"]
+			});
 		};
 
-		window.addEventListener("settingTransactionCompletedEvent", handleTransaction);
+		window.addEventListener(
+			"settingTransactionCompletedEvent",
+			handleTransaction
+		);
 
 		return () => {
-			cancelled = true;
 			window.removeEventListener(
 				"settingTransactionCompletedEvent",
 				handleTransaction
 			);
 		};
-	}, [acct]);
+	}, [acct ? acct.id : "acctId", queryClient]);
 
 	return accountSettings;
 }
