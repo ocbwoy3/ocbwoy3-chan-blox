@@ -12,30 +12,40 @@ import {
 	getOmniRecommendationsHome,
 	OmniRecommendation
 } from "@/lib/omniRecommendation";
-import { loadThumbnails } from "@/lib/thumbnailLoader";
-import { useQuery } from "@tanstack/react-query";
+import { getThumbnails, ThumbnailRequest } from "@/lib/thumbnailLoader";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangleIcon } from "lucide-react";
 
 export default function Home() {
 	const SORTS_ALLOWED_IDS = [100000003, 100000001];
+	const queryClient = useQueryClient();
 
-	const { data: rec } = useQuery({
+	const { data: rec, isLoading } = useQuery({
 		queryKey: ["omni-recommendations"],
 		queryFn: async () => {
 			const r = await getOmniRecommendationsHome();
 			if (r) {
-				loadThumbnails(
-					Object.entries(r.contentMetadata.Game).map((a) => ({
-						type: "GameThumbnail",
-						targetId: Number(a[1].rootPlaceId),
-						format: "webp",
-						size: "384x216"
-					}))
-				).catch((a) => {});
+				// Prefetch game thumbnails into React Query cache
+				const gameRequests: ThumbnailRequest[] = Object.entries(
+					r.contentMetadata.Game
+				).map(([_, g]) => ({
+					type: "GameThumbnail" as const,
+					targetId: Number(g.rootPlaceId),
+					format: "webp",
+					size: "384x216"
+				}));
+
+				await queryClient.prefetchQuery({
+					queryKey: [
+						"thumbnails",
+						gameRequests.map((r) => r.targetId)
+					],
+					queryFn: () => getThumbnails(gameRequests)
+				});
 			}
 			return r;
 		},
-		staleTime: 300000, // 5 minutes
+		staleTime: 1000 * 60 * 5, // 5 minutes
 		refetchOnWindowFocus: false
 	});
 
@@ -50,18 +60,19 @@ export default function Home() {
 					<AlertTriangleIcon />
 					<AlertTitle>Warning</AlertTitle>
 					<AlertDescription>
-						This is work in progess, you can follow the development
+						This is work in progress, you can follow the development
 						process on GitHub.
 					</AlertDescription>
 				</Alert>
 			</div>
+
 			<div className="p-4 space-y-8 no-scrollbar">
-				{!rec ? (
+				{isLoading || !rec ? (
 					<Card>
 						<CardContent className="p-4">
 							<div className="h-[200px] flex items-center justify-center">
 								<div className="animate-pulse text-muted-foreground">
-									{"Loading..."}
+									Loading...
 								</div>
 							</div>
 						</CardContent>

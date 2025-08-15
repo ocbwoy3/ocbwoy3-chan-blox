@@ -15,37 +15,27 @@ import { useAccountSettings } from "@/hooks/roblox/useAccountSettings";
 import { loadThumbnails } from "@/lib/thumbnailLoader";
 import { toast } from "sonner";
 import Link from "next/link";
+import { UserProfileDetails } from "@/lib/profile";
 
-// chatgpt + human
-function randomGreeting(name: string): string {
-	const greetings = [`Howdy, ${name}`];
+export function UserProfileHeader({ user }: { user: UserProfileDetails }) {
 
-	const index = Math.floor(Math.random() * greetings.length);
-	return greetings[index];
-}
-
-export function HomeLoggedInHeader() {
-	const profile = useCurrentAccount();
-	const accountSettings = useAccountSettings();
-
-	if (profile === false) {
+	if (!user) {
 		return (
 			<div className="justify-center w-screen px-8 py-6">
 				<Alert variant="destructive" className="bg-base/50 space-x-2">
 					<OctagonXIcon />
 					<AlertTitle>Failed to fetch account info</AlertTitle>
 					<AlertDescription>
-						Please make sure <code>.ROBLOSECURITY</code> is set! Is
-						Roblox having an outage?
+						Is it a React Query bug?
 					</AlertDescription>
 				</Alert>
 			</div>
 		);
 	}
 
-	const presence = useFriendsPresence(profile ? [profile.id] : []);
+	const presence = useFriendsPresence(user ? [user.id] : []);
 
-	const userActivity = presence.find((b) => b.userId === profile?.id);
+	const userActivity = presence.find((b) => b.userId === user?.id);
 	const userPresence = userActivity?.userPresenceType;
 	const borderColor =
 		userPresence === 1
@@ -58,7 +48,7 @@ export function HomeLoggedInHeader() {
 			? "border-surface2/25 bg-surface2/25"
 			: "border-red/25 bg-red/25";
 
-	const isLoaded = !!profile && !!accountSettings;
+	const isLoaded = !!user;
 
 	return (
 		<>
@@ -72,7 +62,7 @@ export function HomeLoggedInHeader() {
 						loadThumbnails([
 							{
 								type: "AvatarHeadShot",
-								targetId: profile ? profile.id : 1,
+								targetId: user ? user.id : 1,
 								format: "webp",
 								size: "720x720"
 							}
@@ -84,7 +74,7 @@ export function HomeLoggedInHeader() {
 					<Skeleton className="w-28 h-28 rounded-full" />
 				) : (
 					<LazyLoadedImage
-						imgId={`AvatarHeadShot_${profile.id}`}
+						imgId={`AvatarHeadShot_${user.id}`}
 						alt=""
 						className={`w-28 h-28 rounded-full shadow-crust border-2 ${borderColor}`}
 					/>
@@ -92,25 +82,15 @@ export function HomeLoggedInHeader() {
 				<div className="flex flex-col justify-center">
 					<span className="text-3xl font-bold text-text flex items-center gap-2">
 						{isLoaded ? (
-							<Link href={`/users/${profile.id}`}>
-								{randomGreeting(
-									window.localStorage.UserPreferredName ||
-										profile.displayName ||
-										"Robloxian!"
-								)}
+							<Link href={`/users/${user.id}`}>
+								{user.displayName}
 							</Link>
 						) : (
 							<>
 								<Skeleton className="w-96 h-8 rounded-lg" />
 							</>
 						)}
-						{!!accountSettings &&
-						accountSettings.IsPremium === true ? (
-							<RobloxPremiumSmall className="w-6 h-6 fill-transparent" />
-						) : (
-							<></>
-						)}
-						{isLoaded ? (
+						{isLoaded && user.hasVerifiedBadge ? (
 							<RobloxVerifiedSmall className="w-6 h-6 fill-blue text-base" />
 						) : (
 							<></>
@@ -119,7 +99,7 @@ export function HomeLoggedInHeader() {
 					<span className="text-base font-mono text-subtext0 mt-1">
 						{isLoaded ? (
 							<>
-								@{profile.name}
+								@{user.name}
 								{!!userActivity && userPresence === 2 ? (
 									<> - {userActivity.lastLocation}</>
 								) : (

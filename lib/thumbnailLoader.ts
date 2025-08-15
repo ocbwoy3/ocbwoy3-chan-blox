@@ -1,5 +1,6 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { addThumbnail } from "@/hooks/use-lazy-load";
 import { proxyFetch } from "./utils";
 
@@ -28,6 +29,7 @@ export async function getThumbnails(
 ): Promise<AssetThumbnail[]> {
 	const batchSize = 100;
 	const results: AssetThumbnail[] = [];
+
 	for (let i = 0; i < b.length; i += batchSize) {
 		const batch = b.slice(i, i + batchSize);
 		const data = await proxyFetch(
@@ -49,19 +51,29 @@ export async function getThumbnails(
 				}
 			}
 		);
+
 		const json = await data.json();
 		json.data.forEach((a: AssetThumbnail) => {
-			// match GameThumbnail from 4972273297::GameThumbnail:384x216:webp:regular and any like- string
-			const ty = b.find((c) => c.targetId == a.targetId)!;
-			addThumbnail(ty.type + "_" + a.targetId.toString(), a.imageUrl);
+			const ty = b.find((c) => c.targetId === a.targetId)!;
+			addThumbnail(`${ty.type}_${a.targetId}`, a.imageUrl);
 		});
+
 		results.push(...(json.data as AssetThumbnail[]));
 	}
+
 	return results;
 }
 
+// React Query hook for caching
+export function useThumbnails(requests: ThumbnailRequest[]) {
+	return useQuery({
+		queryKey: ["thumbnails", requests.map((r) => r.targetId)],
+		queryFn: () => getThumbnails(requests),
+		staleTime: 1000 * 60 * 5 // 5 minutes
+	});
+}
+
+// Optional helper to load without a hook
 export async function loadThumbnails(b: ThumbnailRequest[]): Promise<void> {
 	const th = await getThumbnails(b);
 }
-
-// https://apis.roblox.com/discovery-api/omni-recommendation

@@ -4,6 +4,7 @@ import React, { useMemo } from "react";
 import LazyLoadedImage from "../util/LazyLoadedImage";
 import { StupidHoverThing } from "../util/MiscStuff";
 import { VerifiedIcon } from "./RobloxIcons";
+import Link from "next/link";
 
 export function FriendCarousel({
 	friends: friendsUnsorted,
@@ -122,7 +123,8 @@ export function FriendCarousel({
 									</div>
 								}
 							>
-								<div className="flex flex-col min-w-[6.5rem]">
+								<Link href={`/users/${a.id}`}>
+									<div className="flex flex-col min-w-[6.5rem]">
 									<LazyLoadedImage
 										imgId={`AvatarHeadShot_${a.id}`}
 										alt={a.name}
@@ -141,6 +143,7 @@ export function FriendCarousel({
 										) : null}
 									</span>
 								</div>
+								</Link>
 							</StupidHoverThing>
 						);
 					})}

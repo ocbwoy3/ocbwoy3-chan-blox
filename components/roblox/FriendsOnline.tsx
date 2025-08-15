@@ -11,7 +11,7 @@ export function FriendsHomeSect(
 ) {
 	const friends = useFriendsHome();
 
-	return <FriendCarousel {...props} title="Friends" friends={friends} />;
+	return friends && <FriendCarousel {...props} title="Friends" friends={friends} />;
 }
 
 export function BestFriendsHomeSect(

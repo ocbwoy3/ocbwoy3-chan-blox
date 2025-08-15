@@ -35,15 +35,14 @@ export default function RootLayout({
 				<ReactQueryProvider>
 					<TooltipProvider>
 						<main>
-							<Image
-								/* window.localStorage.BgImageUrl */
+							{/* <Image
 								src={"/bg.png"}
 								width={1920}
 								height={1080}
-								className="w-screen h-screen bg-blend-hard-light fixed top-0 left-0 blur-lg opacity-25"
+								className="w-screen h-screen bg-blend-hard-light fixed top-0 left-0 opacity-25"
 								alt=""
-							/>
-							<div className="z-10 isolate overflow-scroll no-scrollbar w-screen max-h-screen h-screen antialiased overflow-x-hidden">
+							/> */}
+							<div className="backdrop-blur-lg z-10 isolate overflow-scroll no-scrollbar w-screen max-h-screen h-screen antialiased overflow-x-hidden">
 								<QuickTopUI />
 								<QuickTopUILogoPart />
 								{children}

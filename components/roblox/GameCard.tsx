@@ -29,6 +29,8 @@ export const GameCard = React.memo(function GameCard({ game }: GameCardProps) {
 								}
 								alt={game.name}
 								className="object-fill w-full h-full"
+								lazyFetch={false} // ALWAYS fetch immediately
+								size="384x216" // match game thumbnail size
 							/>
 						) : (
 							<div className="w-full h-full flex items-center justify-center bg-muted">

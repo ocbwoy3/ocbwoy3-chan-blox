@@ -12,15 +12,15 @@ export function useRobuxBalance() {
 	const { data: robux } = useQuery<number | false | null>({
 		queryKey: ["robux-balance", acct ? acct.id : "acctId"],
 		queryFn: async () => {
-			if (!acct) return null;
+			if (!acct) return 0;
 			try {
 				const res = await proxyFetch(
 					`https://economy.roblox.com/v1/users/${acct.id}/currency`
 				);
 				const data = await res.json();
-				return data.robux;
+				return data.robux || 0;
 			} catch {
-				return false;
+				return 0;
 			}
 		},
 		enabled: !!acct,
